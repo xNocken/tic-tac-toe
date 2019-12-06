@@ -11,70 +11,70 @@ const checkWinner = (fields) => {
   const points = fields.map(item => item.map(elem => elem.data('info').player || 0));
   const rowLength = parseInt(config.settings.fields, 10);
 
-  let lastPlayer = 0;
   let countPlayer1 = 0;
   let countPlayer2 = 0;
   let winner = 0;
 
-  let hi = [];
-
-  console.log(points);
-
   for (let o = 0; o < rowLength; o += 1) {
     countPlayer1 = 0;
-    console.log('clear stats');
     countPlayer2 = 0;
-    console.log('RESET');
+
+    let player1Down = true;
+    let player1Diag = true;
+    let player1Left = true;
+
+    let player2Down = true;
+    let player2Diag = true;
+    let player2Left = true;
 
     for (let i = 0; i < rowLength; i += 1) {
       if (points[o][o]) {
-        if ((points[o][i] === 1 && ((i === 0 && o === 0) || (i !== o))) || (points[i][i] === 1 && i === 0 && o === 0) || (points[i][o] === 1 && ((i === 0 && o === 0) || (i !== o)))) {
-          countPlayer1 += 1;
+        if (points[o][i] === 1 || points[i][i] === 1 || points[i][o] === 1) {
+          if (points[o][i] !== 1) {
+            player1Down = false;
+          }
+          if (points[i][i] !== 1) {
+            player1Diag = false;
+          }
+          if (points[i][o] !== 1) {
+            player1Left = false;
+          }
+
+          if (player1Left || player1Diag || player1Down) {
+            countPlayer1 += 1;
+          }
         }
 
-        if ((points[o][i] === 2 && i === 0) || (points[i][i] === 2 && i === 0 && o === 0) || (points[i][o] === 2 && o === 0)) {
-          countPlayer2 += 1;
+        if (points[o][i] === 2 || points[i][i] === 2 || points[i][o] === 2) {
+          if (points[o][i] !== 2) {
+            player2Down = false;
+          }
+          if (points[i][i] !== 2) {
+            player2Diag = false;
+          }
+          if (points[i][o] !== 2) {
+            player2Left = false;
+          }
+
+          if (player2Left || player2Diag || player2Down) {
+            countPlayer2 += 1;
+          }
         }
-        console.log('o: ', o, ' i: ', i);
         if (countPlayer1 === rowLength) {
           winner = 1;
-          console.log('Winner: ', 1, o, i);
         }
 
         if (countPlayer2 === rowLength) {
-          console.log('Winner: ', 2, o, i);
           winner = 2;
         }
-        console.log(countPlayer1, countPlayer2);
       } else {
         countPlayer1 = 0;
         countPlayer2 = 0;
-        console.log('clear stats');
       }
     }
   }
 
-  // points.forEach((row, xIndex) => {
-  //   row.forEach((elem, yIndex) => {
-  //     if (elem === 0) {
-  //       return;
-  //     }
-
-  //     if (elem !== lastPlayer) {
-  //       lastPlayer = elem;
-  //       count = 0;
-  //       return;
-  //     }
-  //     lastPlayer = elem;
-  //     count += 1;
-  //     console.log(count, elem, rowLength);
-  //     if (count === rowLength) {
-  //       winner = lastPlayer;
-  //     }
-  //   });
-  // });
-
-  console.log(winner);
+  return winner;
 };
 
 const fieldClick = ($element, isPlayer1) => {
