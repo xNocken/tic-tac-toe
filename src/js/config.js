@@ -1,4 +1,5 @@
 const settings = {
+  botDelay: 100,
 };
 
 const getSetting = setting => settings[setting];
