@@ -2,7 +2,7 @@
   display: inline-block;
   height: 60px;
   width: 60px;
-  margin: 20px;
+  margin: 5px;
   border: 1px solid gray;
   background-color: white;
 
@@ -15,4 +15,9 @@
       background-color: red;
     }
   }
+}
+
+.row {
+  display: flex;
+  flex-wrap: nowrap;
 }

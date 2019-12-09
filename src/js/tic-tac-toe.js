@@ -9,6 +9,7 @@ const getObjectFromSerializeString = string => string.split('&')
 
 const checkWinner = (fields) => {
   const points = fields.map(item => item.map(elem => elem.data('info').player || 0));
+  global.points = points;
   const rowLength = parseInt(config.settings.fields, 10);
 
   let countPlayer1 = 0;
@@ -22,14 +23,19 @@ const checkWinner = (fields) => {
     let player1Down = true;
     let player1Diag = true;
     let player1Left = true;
+    let player1BackDiag = true;
 
     let player2Down = true;
     let player2Diag = true;
     let player2Left = true;
+    let player2BackDiag = true;
 
     for (let i = 0; i < rowLength; i += 1) {
       if (points[o][o]) {
-        if (points[o][i] === 1 || points[i][i] === 1 || points[i][o] === 1) {
+        if (points[o][i] === 1
+          || points[i][i] === 1
+          || points[i][o] === 1
+          || points[i][(points.length - 1) - i] === 1) {
           if (points[o][i] !== 1) {
             player1Down = false;
           }
@@ -39,13 +45,18 @@ const checkWinner = (fields) => {
           if (points[i][o] !== 1) {
             player1Left = false;
           }
+          if (points[i][(points.length - 1) - i] !== 1) {
+            player1BackDiag = false;
+          }
 
-          if (player1Left || player1Diag || player1Down) {
+          if (player1Left || player1Diag || player1Down || player1BackDiag) {
             countPlayer1 += 1;
           }
         }
-
-        if (points[o][i] === 2 || points[i][i] === 2 || points[i][o] === 2) {
+        if (points[o][i] === 2
+          || points[i][i] === 2
+          || points[i][o] === 2
+          || points[i][(points.length - 1) - i] === 2) {
           if (points[o][i] !== 2) {
             player2Down = false;
           }
@@ -55,8 +66,10 @@ const checkWinner = (fields) => {
           if (points[i][o] !== 2) {
             player2Left = false;
           }
-
-          if (player2Left || player2Diag || player2Down) {
+          if (points[i][(points.length - 1) - i] !== 2) {
+            player2BackDiag = false;
+          }
+          if (player2Left || player2Diag || player2Down || player2BackDiag) {
             countPlayer2 += 1;
           }
         }
@@ -75,6 +88,11 @@ const checkWinner = (fields) => {
   }
 
   return winner;
+};
+
+const endGame = (winner) => {
+  alert(config.settings[`player${winner}`]);
+  $('div').unbind('click');
 };
 
 const fieldClick = ($element, isPlayer1) => {
@@ -96,12 +114,12 @@ export default () => {
     const h = getObjectFromSerializeString($(event.target).serialize());
 
     const gameSettings = {
-      fields: h[1],
-      name: h[0],
+      fields: h[2],
     };
 
     config.setSetting('player1', h[0]);
-    config.setSetting('fields', h[1]);
+    config.setSetting('player2', h[1]);
+    config.setSetting('fields', h[2]);
 
     const length = gameSettings.fields;
 
@@ -123,7 +141,9 @@ export default () => {
           if (!element.data('info').clicked) {
             fieldClick(element, isPlayer1);
             isPlayer1 = !isPlayer1;
-            checkWinner(fields);
+            if (checkWinner(fields) !== 0) {
+              endGame(checkWinner(fields));
+            }
           }
         });
         row.append(element);
