@@ -2,90 +2,47 @@ import $ from 'jquery';
 import config from './config';
 
 const checkWinner = (fields) => {
+  console.time();
   const points = fields.map(item => item.map(elem => elem.data('info').player || 0));
-  global.points = points;
   const rowLength = parseInt(config.settings.fields, 10);
-
-  let countPlayer1 = 0;
-  let countPlayer2 = 0;
   let winner = 0;
-  const StringsToCheck = [];
+
+  const strings = Array.from({ length: 2 }).map(() => '');
 
   for (let o = 0; o < rowLength; o += 1) {
-    let string1Player2 = '';
-    let string2Player2 = '';
-    let string3Player2 = '';
-    let string4Player2 = '';
-
-    let string1Player1 = '';
-    let string2Player1 = '';
-    let string3Player1 = '';
-    let string4Player1 = '';
-
+    let string1 = '';
+    let string2 = '';
+    strings[0] += points[o][o];
+    strings[1] += points[o][(points.length - 1) - o];
 
     for (let i = 0; i < rowLength; i += 1) {
-      if (points[o][o]) {
-        if (points[o][i] === 1
-          || points[i][i] === 1
-          || points[i][o] === 1
-          || points[i][(points.length - 1) - i] === 1) {
-          if (points[o][i] !== 1) {
-            stringPlayer1 += points[o][i];
-          }
-          if (points[i][i] !== 1) {
-            player1Diag = false;
-          }
-          if (points[i][o] !== 1) {
-            player1Left = false;
-          }
-          if (points[i][(points.length - 1) - i] !== 1) {
-            player1BackDiag = false;
-          }
-
-          if (player1Left || player1Diag || player1Down || player1BackDiag) {
-            countPlayer1 += 1;
-          }
-        }
-        if (points[o][i] === 2 || points[i][i] === 2
-          || points[i][o] === 2 || points[i][(points.length - 1) - i] === 2) {
-          if (points[o][i] !== 2) {
-            player2Down = false;
-          }
-          if (points[i][i] !== 2) {
-            player2Diag = false;
-          }
-          if (points[i][o] !== 2) {
-            player2Left = false;
-          }
-          if (points[i][(points.length - 1) - i] !== 2) {
-            player2BackDiag = false;
-          }
-          if (player2Left || player2Diag || player2Down || player2BackDiag) {
-            countPlayer2 += 1;
-          }
-        }
-        if (countPlayer1 === rowLength) {
-          winner = 1;
-        }
-
-        if (countPlayer2 === rowLength) {
-          winner = 2;
-        }
-      } else {
-        countPlayer1 = 0;
-        countPlayer2 = 0;
-      }
+      string1 += points[o][i];
+      string2 += points[i][o];
     }
+    strings.push(string1);
+    strings.push(string2);
   }
 
+  strings.forEach((string) => {
+    if (string === '1'.repeat(rowLength)) {
+      winner = 1;
+    }
+
+    if (string === '2'.repeat(rowLength)) {
+      winner = 2;
+    }
+  });
+  console.timeEnd();
   return winner;
 };
 
 const endGame = (winner, bot = false, draw = false) => {
   let message = bot ? 'Bot' : config.settings[`player${winner}`];
   if (draw) { message = 'draw'; }
+
   alert(message);
-  $('div').unbind('click');
+
+  $('.field').unbind('click');
 };
 
 const fieldClick = ($element, isPlayer1) => {
