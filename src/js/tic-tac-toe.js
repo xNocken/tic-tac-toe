@@ -1,12 +1,6 @@
 import $ from 'jquery';
 import config from './config';
 
-const getObjectFromSerializeString = string => string.split('&')
-  .map((item) => {
-    const splitItem = item.split('=');
-    return splitItem[1];
-  });
-
 const checkWinner = (fields) => {
   const points = fields.map(item => item.map(elem => elem.data('info').player || 0));
   global.points = points;
@@ -90,8 +84,8 @@ const checkWinner = (fields) => {
   return winner;
 };
 
-const endGame = (winner) => {
-  alert(config.settings[`player${winner}`]);
+const endGame = (winner, bot = false) => {
+  alert(bot ? 'Bot' : config.settings[`player${winner}`]);
   $('div').unbind('click');
 };
 
@@ -103,32 +97,49 @@ const fieldClick = ($element, isPlayer1) => {
   infos.clicked = true;
   infos.player = isPlayer1 ? 1 : 2;
   $element.data('info', infos);
+
+  config.setSetting('clicked', config.settings.clicked + 1);
+};
+
+const player2Bot = (fields) => {
+  let x = Math.floor(Math.random() * (config.settings.fields - 1));
+  let y = Math.floor(Math.random() * (config.settings.fields - 1));
+  const lastInput = config.settings.clicked !== config.settings.maxFields;
+
+  while (fields[x][y].data('info').player !== 0 && lastInput) {
+    x = Math.floor(Math.random() * config.settings.fields);
+    y = Math.floor(Math.random() * config.settings.fields);
+  }
+
+  if (lastInput) { fieldClick(fields[x][y], false); }
 };
 
 export default () => {
-  let isPlayer1 = true;
-
   $('#start-form').on('submit', (event) => {
     event.preventDefault();
 
-    const h = getObjectFromSerializeString($(event.target).serialize());
+    let isPlayer1 = true;
+    const { target } = event;
+    config.setSetting('clicked', 0);
+    config.setSetting('player1', target[0].value);
+    config.setSetting('player2', target[1].value);
+    config.setSetting('fields', target[2].value);
+    config.setSetting('mode', target[3].value);
+    config.setSetting('maxFields', parseInt(target[2].value, 10) * parseInt(target[2].value, 10));
 
-    const gameSettings = {
-      fields: h[2],
-    };
-
-    config.setSetting('player1', h[0]);
-    config.setSetting('player2', h[1]);
-    config.setSetting('fields', h[2]);
-
-    const length = gameSettings.fields;
+    const length = config.settings.fields;
 
     const fields = Array.from({ length })
       .map((item, xIndex) => Array.from({ length })
         .map((item2, yIndex) => {
           const element = $('<div class="field"></div>');
 
-          element.data('info', { x: xIndex, y: yIndex, clicked: false });
+          element.data('info', {
+            x: xIndex,
+            y: yIndex,
+            clicked: false,
+            player: 0,
+          });
           return element;
         }));
 
@@ -143,6 +154,13 @@ export default () => {
             isPlayer1 = !isPlayer1;
             if (checkWinner(fields) !== 0) {
               endGame(checkWinner(fields));
+            } else if (parseInt(config.settings.mode, 10) === 1) {
+              player2Bot(fields);
+              isPlayer1 = !isPlayer1;
+
+              if (checkWinner(fields) !== 0) {
+                endGame(checkWinner(fields), true);
+              }
             }
           }
         });
