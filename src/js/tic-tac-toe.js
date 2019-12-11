@@ -1,10 +1,6 @@
-/* eslint-disable no-console */
-/* eslint-disable no-alert */
 import $ from 'jquery';
-import io from 'socket.io-client';
 import config from './config';
-
-let socket;
+import server from './server';
 
 const checkWinner = (fields) => {
   const points = fields.map(item => item.map(elem => elem.data('info').player || 0));
@@ -46,11 +42,6 @@ const endGame = (winner, bot = false, draw = false) => {
 
   alert(message);
 
-  if (socket) {
-    socket.disconnect();
-    socket = undefined;
-  }
-
   $('.field').unbind('click');
 };
 
@@ -67,24 +58,6 @@ const fieldClick = ($element, isPlayer1) => {
 
   const gameRunnig = config.settings.clicked !== config.settings.maxFields;
   config.setSetting('gameRunning', gameRunnig);
-
-  if (config.settings.mode === 3) {
-    socket.emit('click', { x: infos.x, y: infos.y });
-  }
-};
-
-const createSocket = () => {
-  socket = io('ws://172.17.2.156:8080');
-
-  socket.on('connect', () => {
-    console.log('Connected to: ws://172.17.2.156:8080');
-  });
-
-  socket.on('winner', (data) => {
-    endGame(data.message);
-  });
-
-  socket.emit('startgame', { length: config.settings.fields, player1: config.settings.player1, player2: config.settings.player2 });
 };
 
 const player2Bot = (fields, isPlayer1 = false) => {
@@ -102,19 +75,21 @@ const player2Bot = (fields, isPlayer1 = false) => {
 export default () => {
   $('#start-form').on('submit', (event) => {
     event.preventDefault();
+    const { target } = event;
 
     let inputBlocked = false;
     let isPlayer1 = true;
-    const { target } = event;
     config.setSetting('clicked', 0);
     config.setSetting('player1', target[0].value);
     config.setSetting('player2', target[1].value);
     config.setSetting('fields', target[2].value);
-    config.setSetting('mode', parseInt(target[3].value, 10));
+    config.setSetting('mode', target[3].value);
     config.setSetting('maxFields', parseInt(target[2].value, 10) * parseInt(target[2].value, 10));
 
-    if (config.settings.mode === 3) {
-      createSocket();
+    if (target[3].value === '3') {
+      console.log('SERVER');
+      server();
+      return;
     }
 
     const length = config.settings.fields;
@@ -146,7 +121,7 @@ export default () => {
           fieldClick(element, isPlayer1);
           isPlayer1 = !isPlayer1;
 
-          if (checkWinner(fields) !== 0 && config.settings.mode !== 3) {
+          if (checkWinner(fields) !== 0) {
             endGame(checkWinner(fields));
             return;
           }
@@ -155,7 +130,7 @@ export default () => {
             endGame('', false, true);
           }
 
-          if (parseInt(config.settings.mode, 10) !== 1) {
+          if (parseInt(config.settings.mode, 10) === 2) {
             return;
           }
 

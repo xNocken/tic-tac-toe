@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
 /* eslint-disable no-unreachable */
-
 const fs = require('fs');
-let gSocket;
+
+const sessions = {};
+const players = [];
 
 const handler = (req, res) => {
   fs.readFile(`${__dirname}/..${req.url === '/' ? '/index.html' : req.url}`,
@@ -58,10 +59,11 @@ const checkWinner = () => {
   return winner;
 };
 
-const endGame = (winner, bot = false, draw = false) => {
-  let message = bot ? 'Bot' : config.settings[`player${winner}`];
-  if (draw) { message = 'draw'; }
-  gSocket.emit('winner', { message: message });
+const endGame = (winner, draw = false) => {
+  config.setSetting('gameRunning', false);
+  let message = config.settings[`player${winner}`];
+  if (draw) { message = 'its a draw'; }
+  io.sockets.emit('winner', { message: message || 'Unnamed' });
 };
 
 const fieldClick = (x, y) => {
@@ -70,6 +72,8 @@ const fieldClick = (x, y) => {
   if (config.settings.fields[x][y] !== 0) {
     return;
   }
+
+  io.sockets.emit('fieldClick', { player: isPlayer1 ? 1 : 2, x, y });
 
   const infos = isPlayer1 ? 1 : 2;
 
@@ -81,43 +85,70 @@ const fieldClick = (x, y) => {
   config.setSetting('gameRunning', gameRunnig);
 };
 
-const startGame = (length, player1, player2) => {
+const startGame = (length) => {
   const field = Array.from({ length })
     .map(() => Array.from({ length })
       .map(() => 0));
 
   config.setSetting('fields', field);
-  config.setSetting('length', length);
   config.setSetting('clicked', 0);
-  config.setSetting('player1', player1);
-  config.setSetting('player2', player2);
   config.setSetting('isPlayer1', true);
+
+  io.sockets.emit('generatefields', { length });
+
+  const player1 = Math.floor(Math.random() * (players.length));
+  let player2 = Math.floor(Math.random() * (players.length));
+  while (player2 === player1) {
+    player2 = Math.floor(Math.random() * (players.length));
+  }
+
+  sessions.player1 = players[player1];
+  sessions.player2 = players[player2];
 };
 
 io.on('connection', (socket) => {
-  gSocket = socket;
+  console.log(socket.id, 'Joined');
+
   socket.on('click', (data) => {
+    if (sessions[`player${config.settings.isPlayer1 ? 1 : 2}`].id !== socket.id) {
+      return;
+    }
+
     fieldClick(data.x, data.y);
     const winner = checkWinner();
 
     if (winner) {
       endGame(winner);
+    }
+
+    if (config.settings.clicked === config.settings.length * config.settings.length) {
+      endGame(0, true);
     }
   });
 
   socket.on('startgame', (data) => {
-    console.log(data);
-    startGame(data.length, data.player1, data.player2);
+    players.push({ id: socket.id, name: data.player1 });
+
+    console.log(config.settings);
+    if (config.settings.gameRunning) {
+      socket.emit('spectate', { fields: config.settings.fields });
+      return;
+    }
+
+    global.sessions = sessions;
+    if (players.length >= 2) {
+      startGame(data.length);
+    }
   });
 
-  socket.on('click', (data) => {
-    fieldClick(data.x, data.y);
-    const winner = checkWinner();
+  socket.on('disconnect', () => {
+    players.forEach((player, index) => {
+      if (player.id === socket.id) {
+        players.slice(index, 1);
+      }
+    });
 
-    console.log(config.settings.fields);
-
-    if (winner) {
-      endGame(winner);
-    }
+    global.sessions = sessions;
+    console.log(socket.id, 'left');
   });
 });

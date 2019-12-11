@@ -26,6 +26,7 @@
     "fast-sass-loader": "^1.5.0",
     "file-loader": "^5.0.2",
     "mini-css-extract-plugin": "^0.8.0",
+    "ndb": "^1.1.5",
     "node-sass": "^4.12.0",
     "postcss-loader": "^3.0.0",
     "sass-loader": "^8.0.0",
@@ -36,6 +37,8 @@
   "dependencies": {
     "jquery": "^3.4.1",
     "socket.io": "^2.3.0",
-    "socket.io-client": "^2.3.0"
+    "socket.io-client": "^2.3.0",
+    "socket.io-parser": "^3.4.0",
+    "socket.io-redis": "^5.2.0"
   }
 }
