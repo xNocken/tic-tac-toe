@@ -8,7 +8,7 @@ const setSetting = (setting, value) => {
   settings[setting] = value;
 };
 
-module.export = {
+module.exports = {
   getSetting,
   setSetting,
   settings,
