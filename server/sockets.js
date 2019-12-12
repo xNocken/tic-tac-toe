@@ -3,6 +3,7 @@ const logic = require('./logic');
 
 module.exports = (io) => {
   io.on('connection', (socket) => {
+    // eslint-disable-next-line no-console
     console.log(socket.id, 'Joined');
     config.settings.players.push({ id: socket.id });
 
@@ -29,19 +30,26 @@ module.exports = (io) => {
     });
 
     socket.on('startgame', (data) => {
+      if (data.player1.length > 30) {
+        socket.emit('rejected', { message: 'name length must be between 0 and 30' });
+        socket.disconnect();
+      }
       config.settings.players.forEach((player, index) => {
         if (player.id === socket.id) {
-          config.settings.players[index].name = data.player1;
+          config.settings.players[index].name = logic.escapeString(data.player1);
         }
       });
-      console.log(config.settings.gameRunning);
+
+      config.setSetting('length', data.length);
       if (config.settings.gameRunning) {
         socket.emit('spectate', { fields: config.settings.fields });
+        io.sockets.emit('updateStatus', { message: `${data.player1} joined as spectator` });
         return;
       }
 
       global.sessions = config.settings.sessions;
       if (config.settings.players.length >= 2) {
+        config.resetSettings();
         logic.startGame(data.length);
       } else {
         socket.emit('updateStatus', { message: 'waiting for players' });
@@ -49,8 +57,9 @@ module.exports = (io) => {
     });
 
     socket.on('disconnect', () => {
+    // eslint-disable-next-line no-console
       console.log(socket.id, 'left');
-      if (!config.settings.sessions.player1) {
+      if (config.settings.players.length === 0) {
         return;
       }
 

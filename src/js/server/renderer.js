@@ -44,6 +44,6 @@ export const spectate = (fields) => {
   });
 };
 
-export const updateStatus = (message) => {
-  $('#status').text(message);
+export const updateStatus = (message, addedClass = '') => {
+  $('#status').prepend(`<p class="${addedClass}">${message}</p>`);
 };

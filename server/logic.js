@@ -34,6 +34,14 @@ const checkWinner = () => {
   return winner;
 };
 
+const escapeString = (string) => {
+  let changedString = string;
+  while (changedString.match(/</)) { changedString = changedString.replace('<', '&lt'); }
+  while (changedString.match(/>/)) { changedString = changedString.replace('>', '&gt'); }
+  while (changedString.match(/"/)) { changedString = changedString.replace('"', '&quot'); }
+  return changedString;
+};
+
 const fieldClick = (x, y, name) => {
   const { isPlayer1, clicked, maxFields } = config.settings;
 
@@ -42,7 +50,7 @@ const fieldClick = (x, y, name) => {
   }
 
   config.sockets.io.sockets.emit('fieldClick', { player: isPlayer1 ? 1 : 2, x, y });
-  config.sockets.io.sockets.emit('updateStatus', { message: `Next player: ${name}` });
+  config.sockets.io.sockets.emit('updateStatus', { message: `Next player: ${name || 'Unnamed'}` });
 
   const infos = isPlayer1 ? 1 : 2;
 
@@ -58,10 +66,11 @@ const endGame = (winner, draw = false, left = false) => {
   config.setSetting('gameRunning', false);
   let message;
 
-  if (winner) { message = config.settings.sessions[`player${winner}`].name; }
+  if (winner) { message = `${config.settings.sessions[`player${winner}`].name || 'Unnamed'} won`; }
   if (draw) { message = 'its a draw'; }
-  if (left) { message = 'player left'; }
-  config.sockets.io.sockets.emit('updateStatus', { message: `${message || 'Unnamed'} won` });
+  if (left) { message = 'Game ended: Not enough players'; }
+  config.sockets.io.sockets.emit('updateStatus', { message });
+  config.sockets.io.sockets.emit('winning');
 };
 
 const startGame = (length) => {
@@ -94,4 +103,5 @@ module.exports = {
   endGame,
   fieldClick,
   checkWinner,
+  escapeString,
 };

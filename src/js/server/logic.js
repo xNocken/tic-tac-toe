@@ -1,9 +1,7 @@
 import $ from 'jquery';
 import config from '../config';
 
-export const endGame = (cMessage) => {
-  // eslint-disable-next-line
-  alert(cMessage);
+export const endGame = () => {
   $('.field').unbind('click');
 };
 

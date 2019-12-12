@@ -21,3 +21,12 @@
   display: flex;
   flex-wrap: nowrap;
 }
+
+#status {
+  height: 160px;
+  overflow-y: scroll;
+
+  .warning {
+    color: red;
+  }
+}
