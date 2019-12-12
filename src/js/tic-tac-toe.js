@@ -1,8 +1,8 @@
 import $ from 'jquery';
 import config from './config';
+import server from './server';
 
 const checkWinner = (fields) => {
-  console.time();
   const points = fields.map(item => item.map(elem => elem.data('info').player || 0));
   const rowLength = parseInt(config.settings.fields, 10);
   let winner = 0;
@@ -32,7 +32,7 @@ const checkWinner = (fields) => {
       winner = 2;
     }
   });
-  console.timeEnd();
+
   return winner;
 };
 
@@ -60,7 +60,7 @@ const fieldClick = ($element, isPlayer1) => {
   config.setSetting('gameRunning', gameRunnig);
 };
 
-const player2Bot = (fields) => {
+const player2Bot = (fields, isPlayer1 = false) => {
   let x = Math.floor(Math.random() * (config.settings.fields - 1));
   let y = Math.floor(Math.random() * (config.settings.fields - 1));
 
@@ -69,22 +69,28 @@ const player2Bot = (fields) => {
     y = Math.floor(Math.random() * config.settings.fields);
   }
 
-  if (config.settings.gameRunning) { fieldClick(fields[x][y], false); }
+  if (config.settings.gameRunning) { fieldClick(fields[x][y], isPlayer1); }
 };
 
 export default () => {
   $('#start-form').on('submit', (event) => {
     event.preventDefault();
+    const { target } = event;
 
     let inputBlocked = false;
     let isPlayer1 = true;
-    const { target } = event;
     config.setSetting('clicked', 0);
     config.setSetting('player1', target[0].value);
     config.setSetting('player2', target[1].value);
     config.setSetting('fields', target[2].value);
     config.setSetting('mode', target[3].value);
     config.setSetting('maxFields', parseInt(target[2].value, 10) * parseInt(target[2].value, 10));
+
+    if (target[3].value === '3') {
+      console.log('SERVER');
+      server();
+      return;
+    }
 
     const length = config.settings.fields;
 
