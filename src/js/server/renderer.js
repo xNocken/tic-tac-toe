@@ -1,4 +1,5 @@
 import $ from 'jquery';
+
 import { fieldClick } from './logic';
 import config from '../config';
 
@@ -14,31 +15,36 @@ export const generateFields = (length) => {
           clicked: false,
           player: 0,
         });
+
         return element;
       }));
+
   config.setSetting('field', fields);
 
   $('#fields').empty();
-  fields.forEach((item) => {
-    const row = $('<div class="row"></div>');
-    item.forEach((element) => {
-      element.on('click', () => {
-        fieldClick(element);
-      });
-      row.append(element);
+
+  fields.forEach((row) => {
+    const $row = $('<div class="row"></div>');
+
+    row.forEach(($field) => {
+      $field.on('click', () => fieldClick($field));
+
+      $row.append($field);
     });
 
-    $('#fields').append(row);
+    $('#fields').append($row);
   });
+
   return fields;
 };
 
 export const spectate = (fields) => {
   const newField = generateFields(fields.length);
-  fields.forEach((item, xIndex) => {
-    item.forEach((item2, yIndex) => {
-      if (item) {
-        newField[xIndex][yIndex].addClass(`field--clicked-player${item2}`);
+
+  fields.forEach((row, xIndex) => {
+    row.forEach((field, yIndex) => {
+      if (row) {
+        newField[xIndex][yIndex].addClass(`field--clicked-player${field}`);
       }
     });
   });

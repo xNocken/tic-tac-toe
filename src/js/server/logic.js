@@ -1,4 +1,5 @@
 import $ from 'jquery';
+
 import config from '../config';
 
 export const endGame = () => {
@@ -6,16 +7,18 @@ export const endGame = () => {
 };
 
 export const checkField = (player, $element) => {
-  const infos = $element.data('info');
+  const info = $element.data('info');
 
   $element.addClass(`field--clicked-player${player}`);
 
-  infos.clicked = true;
-  infos.player = player;
-  $element.data('info', infos);
+  info.clicked = true;
+  info.player = player;
+
+  $element.data('info', info);
 };
 
 export const fieldClick = ($element) => {
-  const infos = $element.data('info');
-  config.settings.socket.emit('click', { x: infos.x, y: infos.y });
+  const { x, y } = $element.data('info');
+
+  config.settings.socket.emit('click', { x, y });
 };

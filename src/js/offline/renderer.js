@@ -1,4 +1,5 @@
 import $ from 'jquery';
+
 import config from '../config';
 import {
   fieldClick,
@@ -15,8 +16,11 @@ const clicker = (element, fields) => {
   fieldClick(element, config.settings.isPlayer1);
   config.setSetting('isPlayer1', !config.settings.isPlayer1);
 
-  if (checkWinner(fields) !== 0) {
-    endGame(checkWinner(fields));
+  let winner = checkWinner(fields);
+
+  if (winner !== 0) {
+    endGame(winner);
+
     return;
   }
 
@@ -24,7 +28,7 @@ const clicker = (element, fields) => {
     endGame('', false, true);
   }
 
-  if (parseInt(config.settings.mode, 10) === 2) {
+  if (config.settings.mode === '2') {
     return;
   }
 
@@ -32,13 +36,17 @@ const clicker = (element, fields) => {
     player2Bot(fields);
     config.setSetting('inputBlocked', false);
 
-    if (checkWinner(fields) !== 0) {
-      endGame(checkWinner(fields), true);
+    winner = checkWinner(fields);
+
+    if (winner !== 0) {
+      endGame(winner, true);
     }
   }, config.settings.botDelay);
 
-  config.setSetting('inputBlocked', true);
-  config.setSetting('isPlayer1', !config.settings.isPlayer1);
+  config.setSettings({
+    inputBlocked: true,
+    isPlayer1: !config.settings.isPlayer1,
+  });
 };
 
 export default () => {
@@ -55,18 +63,21 @@ export default () => {
           clicked: false,
           player: 0,
         });
+
         return element;
       }));
 
   $('#fields').empty();
-  fields.forEach((item) => {
-    const row = $('<div class="row"></div>');
 
-    item.forEach((element) => {
-      element.on('click', () => clicker(element, fields));
-      row.append(element);
+  fields.forEach((row) => {
+    const $row = $('<div class="row"></div>');
+
+    row.forEach(($field) => {
+      $field.on('click', () => clicker($field, fields));
+
+      $row.append($field);
     });
 
-    $('#fields').append(row);
+    $('#fields').append($row);
   });
 };
