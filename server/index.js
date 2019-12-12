@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 const handler = (req, res) => {
-  fs.readFile(`${__dirname}/..${req.url === '/' ? '/index.html' : req.url}`,
+  fs.readFile(`${__dirname}/..${req.url.split('?')[0] === '/' ? '/index.html' : req.url.split('?')[0]}`,
     (err, data) => {
       if (err) {
         res.writeHead(404);
