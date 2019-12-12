@@ -67,28 +67,34 @@ const spectate = (fields) => {
   });
 };
 
+const updateStatus = (message) => {
+  $('#status').text(message);
+};
+
 const createSocket = () => {
-  if (socket) {
-    socket.disconnect();
+  if (!socket) {
+    socket = io('ws://172.17.2.156:8080');
+
+    socket.on('winner', (data) => {
+      endGame(data.message);
+    });
+
+    socket.on('fieldClick', (data) => {
+      checkField(data.player, config.settings.field[data.x][data.y]);
+    });
+
+    socket.on('spectate', (data) => {
+      spectate(data.fields);
+    });
+
+    socket.on('generatefields', (data) => {
+      generateFields(data.length);
+    });
+
+    socket.on('updateStatus', (data) => {
+      updateStatus(data.message);
+    });
   }
-
-  socket = io('ws://172.17.2.156:8080');
-
-  socket.on('winner', (data) => {
-    endGame(0, false, false, data.message);
-  });
-
-  socket.on('fieldClick', (data) => {
-    checkField(data.player, config.settings.field[data.x][data.y]);
-  });
-
-  socket.on('spectate', (data) => {
-    spectate(data.fields);
-  });
-
-  socket.on('generatefields', (data) => {
-    generateFields(data.length);
-  });
 
   socket.emit('startgame', { length: config.settings.fields, player1: config.settings.player1 });
 };
