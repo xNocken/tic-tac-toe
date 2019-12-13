@@ -1,7 +1,8 @@
 const settings = {
-  botDelay: 100,
+  botDelay: 0,
   ip: '172.17.2.156',
   port: 8080,
+  botMode: 'simple',
 };
 
 const getSetting = setting => settings[setting];

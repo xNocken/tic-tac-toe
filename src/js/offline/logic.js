@@ -1,9 +1,15 @@
 import $ from 'jquery';
 
+import { minimax, simpleBot } from './bots';
 import config from '../config';
 
-export const checkWinner = (fields) => {
-  const points = fields.map(item => item.map(elem => elem.data('info').player || 0));
+export const checkWinner = (fields, pointsArray) => {
+  let points;
+  if (fields) {
+    points = fields.map(item => item.map(elem => elem.data('info').player || 0));
+  } else {
+    points = pointsArray;
+  }
   const rowLength = parseInt(config.settings.fields, 10);
   const player1WinCondition = '1'.repeat(rowLength);
   const player2WinCondition = '2'.repeat(rowLength);
@@ -34,7 +40,7 @@ export const checkWinner = (fields) => {
       winner = 2;
     }
   });
-
+  console.log(winner);
   return winner;
 };
 
@@ -60,25 +66,18 @@ export const fieldClick = ($element, isPlayer1) => {
   config.setSettings({
     clicked: config.settings.clicked + 1,
     gameRunning,
+    isPlayer1: !isPlayer1,
   });
 };
 
-const getRandomPosition = (offset = 0) => Math.floor(
-  Math.random() * (config.settings.fields - offset),
-);
 
-export const player2Bot = (fields, isPlayer1 = false) => {
-  const { gameRunning } = config.settings;
-
-  let x = getRandomPosition(1);
-  let y = getRandomPosition(1);
-
-  while (fields[x][y].data('info').player !== 0 && gameRunning) {
-    x = getRandomPosition();
-    y = getRandomPosition();
+export const botMove = (fields) => {
+  let move;
+  const points = fields.map(item => item.map($elem => $elem.data('info').player || 0));
+  if (config.settings.botMode === 'minimax') {
+    move = minimax(points, config.setSetting.isPlayer1);
+  } else if (config.settings.botMode === 'simple') {
+    move = simpleBot(points, config.setSetting.isPlayer1 ? 1 : 2);
   }
-
-  if (gameRunning) {
-    fieldClick(fields[x][y], isPlayer1);
-  }
+  fieldClick(fields[move.position.x][move.position.y], config.settings.isPlayer1);
 };
