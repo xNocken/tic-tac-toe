@@ -41,7 +41,6 @@ export const checkWinner = (fields) => {
 export const endGame = (winner, bot, draw) => {
   const message = bot ? 'Bot' : config.settings[`player${winner}`];
 
-  // 🤔
   // eslint-disable-next-line
   alert(draw ? 'draw' : message);
 

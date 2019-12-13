@@ -7,16 +7,16 @@ export const generateFields = (length) => {
   const fields = Array.from({ length })
     .map((_, xIndex) => Array.from({ length })
       .map((__, yIndex) => {
-        const element = $('<div class="field"></div>');
+        const $field = $('<div class="field"></div>');
 
-        element.data('info', {
+        $field.data('info', {
           x: xIndex,
           y: yIndex,
           clicked: false,
           player: 0,
         });
 
-        return element;
+        return $field;
       }));
 
   config.setSetting('field', fields);
@@ -41,10 +41,10 @@ export const generateFields = (length) => {
 export const spectate = (fields) => {
   const newField = generateFields(fields.length);
 
-  fields.forEach((row, xIndex) => {
-    row.forEach((field, yIndex) => {
-      if (row) {
-        newField[xIndex][yIndex].addClass(`field--clicked-player${field}`);
+  fields.forEach(($row, xIndex) => {
+    $row.forEach(($field, yIndex) => {
+      if ($field) {
+        newField[xIndex][yIndex].addClass(`field--clicked-player${$field}`);
       }
     });
   });
