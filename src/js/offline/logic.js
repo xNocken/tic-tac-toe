@@ -1,9 +1,11 @@
 import $ from 'jquery';
 
+// eslint-disable-next-line
 import { minimax, simpleBot } from './bots';
 import config from '../config';
 
 export const checkWinner = (fields, pointsArray) => {
+  console.log(JSON.stringify(pointsArray));
   let points;
   if (fields) {
     points = fields.map(item => item.map(elem => elem.data('info').player || 0));

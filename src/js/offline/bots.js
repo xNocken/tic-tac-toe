@@ -1,3 +1,4 @@
+/* eslint-disable-next-line */ // 😊
 import { checkWinner } from './logic';
 import config from '../config';
 
@@ -78,9 +79,16 @@ const TODONAME = (x, y, points, player) => {
     position: {},
   };
 
-  const newPoints = points;
+  const newPoints = [[], [], []];
+
+  for (let index = 0; index < points.length; index += 1) {
+    for (let index2 = 0; index2 < points.length; index2 += 1) {
+      newPoints[index][index2] = points[index][index2];
+    }
+  }
+
   newPoints[x][y] = player;
-  const result = checkWinner(undefined, points);
+  const result = checkWinner(undefined, newPoints);
   if (result === player) {
     // console.log(JSON.stringify(points));
     move.position.x = x;
@@ -96,8 +104,6 @@ const getRandomPosition = (offset = 0) => Math.floor(
 );
 
 export const simpleBot = (points, player) => {
-  console.log(JSON.stringify(points));
-  console.log('wafwf');
   const { length } = points;
   let move = {
     position: {},
@@ -115,7 +121,6 @@ export const simpleBot = (points, player) => {
       if (points[x][y] === player) {
         if (points[x - 1] && points[x - 1][y] === '0') {
           const tempMove = TODONAME(x - 1, y, points, player);
-          console.log(tempMove);
           if (tempMove.position.x) {
             move = tempMove;
           }
@@ -123,7 +128,6 @@ export const simpleBot = (points, player) => {
 
         if (points[x + 1] && points[x + 1][y] === '0') {
           const tempMove = TODONAME(x + 1, y, points, player);
-          console.log(tempMove);
           if (tempMove.position.x) {
             move = tempMove;
           }
@@ -131,7 +135,6 @@ export const simpleBot = (points, player) => {
 
         if (points[x] && points[x][y - 1] === '0') {
           const tempMove = TODONAME(x, y - 1, points, player);
-          console.log(tempMove);
           if (tempMove.position.x) {
             move = tempMove;
           }
@@ -139,7 +142,6 @@ export const simpleBot = (points, player) => {
 
         if (points[x] && points[x][y + 1] === '0') {
           const tempMove = TODONAME(x, y + 1, points, player);
-          console.log(tempMove);
           if (tempMove.position.x) {
             move = tempMove;
           }
