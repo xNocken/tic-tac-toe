@@ -1,4 +1,4 @@
-/* eslint-disable-next-line */ // 😊
+/* eslint-disable-next-line */ // ⊙.☉
 import { checkWinner } from './logic';
 import config from '../config';
 
@@ -15,7 +15,7 @@ const getEmptySpots = (fields) => {
   return emptySpots;
 };
 
-export const minimax = (fields, isPlayer1 = false) => {
+export const minimax = (fields, isPlayer1 = false, depth = 0) => {
   const newFields = fields;
   const currentPlayer = isPlayer1 ? 1 : 2;
   const emptySpots = getEmptySpots(fields);
@@ -28,7 +28,7 @@ export const minimax = (fields, isPlayer1 = false) => {
   if (winner === 2) {
     return { score: 10 };
   }
-  if (emptySpots.length === 0) {
+  if (emptySpots.length === 0 || depth === 20) {
     return { score: 0 };
   }
 
@@ -38,10 +38,10 @@ export const minimax = (fields, isPlayer1 = false) => {
     newFields[emptySpots[i].x][emptySpots[i].y] = currentPlayer;
 
     if (currentPlayer === 2) {
-      const result = minimax(newFields, true);
+      const result = minimax(newFields, true, depth + 1);
       move.score = result.score;
     } else {
-      const result = minimax(newFields, false);
+      const result = minimax(newFields, false, depth + 1);
       move.score = result.score;
     }
 
@@ -74,7 +74,7 @@ export const minimax = (fields, isPlayer1 = false) => {
   return moves[bestMove];
 };
 
-const TODONAME = (x, y, points, player) => {
+const generateMove = (x, y, points, player) => {
   const move = {
     position: {},
   };
@@ -120,28 +120,28 @@ export const simpleBot = (points, player) => {
     for (let y = 0; y < length; y += 1) {
       if (points[x][y] === player) {
         if (points[x - 1] && points[x - 1][y] === '0') {
-          const tempMove = TODONAME(x - 1, y, points, player);
+          const tempMove = generateMove(x - 1, y, points, player);
           if (tempMove.position.x) {
             move = tempMove;
           }
         }
 
         if (points[x + 1] && points[x + 1][y] === '0') {
-          const tempMove = TODONAME(x + 1, y, points, player);
+          const tempMove = generateMove(x + 1, y, points, player);
           if (tempMove.position.x) {
             move = tempMove;
           }
         }
 
         if (points[x] && points[x][y - 1] === '0') {
-          const tempMove = TODONAME(x, y - 1, points, player);
+          const tempMove = generateMove(x, y - 1, points, player);
           if (tempMove.position.x) {
             move = tempMove;
           }
         }
 
         if (points[x] && points[x][y + 1] === '0') {
-          const tempMove = TODONAME(x, y + 1, points, player);
+          const tempMove = generateMove(x, y + 1, points, player);
           if (tempMove.position.x) {
             move = tempMove;
           }

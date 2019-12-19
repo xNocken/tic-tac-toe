@@ -5,7 +5,6 @@ import { minimax, simpleBot } from './bots';
 import config from '../config';
 
 export const checkWinner = (fields, pointsArray) => {
-  console.log(JSON.stringify(pointsArray));
   let points;
   if (fields) {
     points = fields.map(item => item.map(elem => elem.data('info').player || 0));
@@ -42,7 +41,6 @@ export const checkWinner = (fields, pointsArray) => {
       winner = 2;
     }
   });
-  console.log(winner);
   return winner;
 };
 
@@ -75,11 +73,16 @@ export const fieldClick = ($element, isPlayer1) => {
 
 export const botMove = (fields) => {
   let move;
+  const { botMode } = config.settings;
+
   const points = fields.map(item => item.map($elem => $elem.data('info').player || 0));
-  if (config.settings.botMode === 'minimax') {
+  if (botMode === 'minimax') {
     move = minimax(points, config.setSetting.isPlayer1);
-  } else if (config.settings.botMode === 'simple') {
+  } else if (botMode === 'simple') {
     move = simpleBot(points, config.setSetting.isPlayer1 ? 1 : 2);
+  } else {
+    console.error('invalid bot selected');
+    return;
   }
   fieldClick(fields[move.position.x][move.position.y], config.settings.isPlayer1);
 };
