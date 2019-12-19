@@ -5,7 +5,7 @@ import config from '../config';
 
 export default () => {
   if (!config.settings.socket) {
-    config.settings.socket = io(`ws://${config.settings.ip}:${config.settings.port}`);
+    config.settings.socket = io(`ws://${config.settings.ip}:${config.settings.port}`, { query: `name=${config.settings.player1}` });
 
     config.settings.socket.on('winning', () => {
       endGame();
@@ -35,9 +35,9 @@ export default () => {
       config.settings.socket = undefined;
     });
 
-    config.settings.socket.emit('startgame', { length: config.settings.fields, player1: config.settings.player1 });
+    config.settings.socket.emit('debug', { length: config.settings.fields });
     return;
   }
 
-  config.settings.socket.emit('startgame', { length: config.settings.fields, player1: config.settings.player1 });
+  config.settings.socket.emit('startgame', { length: config.settings.fields });
 };

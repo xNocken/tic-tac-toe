@@ -21,6 +21,6 @@ const config = require('./config');
 
 config.setSocket('io', io);
 
-app.listen(config.settings.port, config.settings.ip);
+app.listen(config.globalSettings.port, config.globalSettings.ip);
 
 sockets(io);

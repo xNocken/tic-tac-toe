@@ -1,12 +1,13 @@
-let settings = {
-  botDelay: 100,
+const globalSettings = {
   players: [],
-  sessions: { player1: {}, player2: {} },
+  sessions: [],
   ip: '172.17.2.156',
   port: 8080,
 };
 
-const unchanged = settings;
+const settings = {
+
+};
 
 const sockets = {
 
@@ -22,17 +23,11 @@ const setSocket = (setting, value) => {
   sockets[setting] = value;
 };
 
-const resetSettings = () => {
-  const { players } = settings;
-  settings = unchanged;
-  settings.players = players;
-};
-
 module.exports = {
   getSetting,
   setSetting,
   settings,
   sockets,
   setSocket,
-  resetSettings,
+  globalSettings,
 };
