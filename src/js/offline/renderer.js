@@ -5,7 +5,7 @@ import {
   fieldClick,
   endGame,
   checkWinner,
-  player2Bot,
+  botMove,
 } from './logic';
 
 const clicker = (element, fields) => {
@@ -33,7 +33,7 @@ const clicker = (element, fields) => {
   }
 
   setTimeout(() => {
-    player2Bot(fields);
+    botMove(fields);
     config.setSetting('inputBlocked', false);
 
     winner = checkWinner(fields);
@@ -50,6 +50,7 @@ const clicker = (element, fields) => {
 };
 
 export default () => {
+  $(document).on('checkWinner', (event, items) => checkWinner(items.fields, items.points));
   const length = config.settings.fields;
 
   const fields = Array.from({ length })
@@ -61,7 +62,7 @@ export default () => {
           x: xIndex,
           y: yIndex,
           clicked: false,
-          player: 0,
+          player: '0',
         });
 
         return element;
