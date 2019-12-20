@@ -1,8 +1,8 @@
-const config = require('./config');
+/* eslint-disable no-param-reassign */
 
-const checkWinner = () => {
-  const points = config.settings.fields;
-  const rowLength = parseInt(config.settings.fields.length, 10);
+const checkWinner = (io, sessionId) => {
+  const points = io.sockets.adapter.rooms[sessionId].fields;
+  const rowLength = parseInt(io.sockets.adapter.rooms[sessionId].fields.length, 10);
   let winner = 0;
 
   const strings = Array.from({ length: 2 }).map(() => '');
@@ -42,60 +42,57 @@ const escapeString = (string) => {
   return changedString;
 };
 
-const fieldClick = (x, y, name) => {
-  const { isPlayer1, clicked, maxFields } = config.settings;
+const fieldClick = (io, sessionId, x, y) => {
+  const activePlayer = io.sockets.adapter.rooms[sessionId].isPlayer1 ? 1 : 0;
+  const nextPlayerId = io.sockets.adapter.rooms[sessionId].players[activePlayer];
 
-  if (config.settings.fields[x][y] !== 0) {
+  const { isPlayer1, clicked, maxFields } = io.sockets.adapter.rooms[sessionId];
+
+  if (io.sockets.adapter.rooms[sessionId].fields[x][y] !== 0) {
     return;
   }
 
-  config.sockets.io.sockets.emit('fieldClick', { player: isPlayer1 ? 1 : 2, x, y });
-  config.sockets.io.sockets.emit('updateStatus', { message: `Next player: ${name || 'Unnamed'}` });
+  io.to(sessionId).emit('fieldClick', { player: isPlayer1 ? 1 : 2, x, y });
+  io.to(sessionId).emit('updateStatus', { message: `Next player: ${io.sockets.connected[nextPlayerId].username || 'Unnamed'}` });
 
   const infos = isPlayer1 ? 1 : 2;
 
-  config.settings.fields[x][y] = infos;
-  config.setSetting('clicked', clicked + 1);
-  config.setSetting('isPlayer1', !isPlayer1);
+  io.sockets.adapter.rooms[sessionId].fields[x][y] = infos;
+  io.sockets.adapter.rooms[sessionId].clicked = clicked + 1;
+  io.sockets.adapter.rooms[sessionId].isPlayer1 = !isPlayer1;
 
   const gameRunnig = clicked + 1 !== maxFields;
-  config.setSetting('gameRunning', gameRunnig);
+  io.sockets.adapter.rooms[sessionId].gameRunning = gameRunnig;
 };
 
-const endGame = (winner, draw = false, left = false) => {
-  config.setSetting('gameRunning', false);
+const endGame = (io, sessionId, winner, draw = false, left = false) => {
+  const winnerId = io.sockets.adapter.rooms[sessionId].players[winner - 1];
+
   let message;
 
-  if (winner) { message = `${config.settings.sessions[`player${winner}`].name || 'Unnamed'} won`; }
+  if (winner) { message = `${io.sockets.connected[winnerId].username || 'Unnamed'} won`; }
   if (draw) { message = 'its a draw'; }
   if (left) { message = 'Game ended: Not enough players'; }
-  config.sockets.io.sockets.emit('updateStatus', { message });
-  config.sockets.io.sockets.emit('winning');
+
+  io.to(sessionId).emit('updateStatus', { message });
+  io.to(sessionId).emit('winning');
 };
 
-const startGame = (length) => {
-  const field = Array.from({ length })
-    .map(() => Array.from({ length })
+const startGame = (length, sessionId, io) => {
+  const field = Array.from({ length: parseInt(length, 10) })
+    .map(() => Array.from({ length: parseInt(length, 10) })
       .map(() => 0));
 
-  config.setSetting('fields', field);
-  config.setSetting('clicked', 0);
-  config.setSetting('isPlayer1', true);
-  config.setSetting('gameRunning', true);
+  io.sockets.adapter.rooms[sessionId].fields = field;
+  io.sockets.adapter.rooms[sessionId].clicked = 0;
+  io.sockets.adapter.rooms[sessionId].isPlayer1 = Math.round(Math.random());
+  io.sockets.adapter.rooms[sessionId].gameRunning = true;
 
-  config.sockets.io.sockets.emit('generatefields', { length });
+  const activePlayer = io.sockets.adapter.rooms[sessionId].isPlayer1 ? 0 : 1;
+  const nextPlayerId = io.sockets.adapter.rooms[sessionId].players[activePlayer];
 
-  const player1 = Math.floor(Math.random() * (config.settings.players.length));
-  let player2 = Math.floor(Math.random() * (config.settings.players.length));
-  while (player2 === player1) {
-    player2 = Math.floor(Math.random() * (config.settings.players.length));
-  }
-
-
-  config.settings.sessions.player1 = config.settings.players[player1];
-  config.settings.sessions.player2 = config.settings.players[player2];
-
-  config.sockets.io.sockets.emit('updateStatus', { message: `Next player: ${config.settings.sessions.player1.name || 'Unnamed'}` });
+  io.to(sessionId).emit('generatefields', { length });
+  io.to(sessionId).emit('updateStatus', { message: `Next player: ${io.sockets.connected[nextPlayerId].username}` });
 };
 
 module.exports = {

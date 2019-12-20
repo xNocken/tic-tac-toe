@@ -32,10 +32,11 @@ export default () => {
     });
 
     config.settings.socket.on('disconnect', () => {
+      updateStatus('Disconnected');
+      config.settings.socket.disconnect();
       config.settings.socket = undefined;
     });
 
-    config.settings.socket.emit('debug', { length: config.settings.fields });
     return;
   }
 
