@@ -1,8 +1,9 @@
+const globals = require('../globalconfig');
+
 const globalSettings = {
   players: [],
   sessions: [],
-  ip: '172.17.2.156',
-  port: 8080,
+  ...globals,
 };
 
 const settings = {

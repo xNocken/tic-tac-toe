@@ -29,4 +29,4 @@ app.listen(config.globalSettings.port, config.globalSettings.ip);
 
 sockets(io);
 
-console.log(`listening on ${config.settings.ip}:${config.settings.port}`);
+console.log(`listening on ${config.globalSettings.ip}:${config.globalSettings.port}`);

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "yarn webpack",
     "prod": "yarn webpack -p",
-    "watch": "yarn webpack --watch"
+    "watch": "yarn webpack --watch",
+    "start": "node server/index.js"
   },
   "author": "Marc Lübke",
   "license": "MIT",

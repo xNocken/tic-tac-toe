@@ -1,8 +1,9 @@
+import globals from '../../globalconfig';
+
 const settings = {
   botDelay: 0,
-  ip: '172.17.2.156',
-  port: 8080,
   botMode: 'minimax',
+  ...globals,
 };
 
 const getSetting = setting => settings[setting];

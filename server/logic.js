@@ -34,13 +34,10 @@ const checkWinner = (io, sessionId) => {
   return winner;
 };
 
-const escapeString = (string) => {
-  let changedString = string;
-  while (changedString.match(/</)) { changedString = changedString.replace('<', '&lt'); }
-  while (changedString.match(/>/)) { changedString = changedString.replace('>', '&gt'); }
-  while (changedString.match(/"/)) { changedString = changedString.replace('"', '&quot'); }
-  return changedString;
-};
+const escapeString = string => string
+  .replace(/</g, '&lt')
+  .replace(/>/g, '&gt')
+  .replace(/"/g, '&quot');
 
 const fieldClick = (io, sessionId, x, y) => {
   const activePlayer = io.sockets.adapter.rooms[sessionId].isPlayer1 ? 1 : 0;
