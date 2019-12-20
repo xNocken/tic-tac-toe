@@ -1,4 +1,5 @@
 import io from 'socket.io-client';
+import $ from 'jquery';
 import { generateFields, spectate, updateStatus } from './renderer';
 import { endGame, checkField } from './logic';
 import config from '../config';
@@ -32,7 +33,8 @@ export default () => {
     });
 
     config.settings.socket.on('disconnect', () => {
-      updateStatus('Disconnected');
+      updateStatus('Disconnected', 'warning');
+      $('#fields').empty();
       config.settings.socket.disconnect();
       config.settings.socket = undefined;
     });
