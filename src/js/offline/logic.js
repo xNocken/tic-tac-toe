@@ -12,24 +12,39 @@ export const checkWinner = (fields, pointsArray) => {
     points = pointsArray;
   }
   const rowLength = parseInt(config.settings.fields, 10);
-  const player1WinCondition = '1'.repeat(rowLength);
-  const player2WinCondition = '2'.repeat(rowLength);
-  const strings = ['', ''];
+
+  let player1WinCondition = '';
+  let player2WinCondition = '';
+
+  if (config.lastLength === rowLength) {
+    ({ player1WinCondition, player2WinCondition } = config);
+  } else {
+    player1WinCondition = '1'.repeat(rowLength);
+    player2WinCondition = '2'.repeat(rowLength);
+    config.player1WinCondition = player1WinCondition;
+    config.player2WinCondition = player2WinCondition;
+    config.lastLength = rowLength;
+  }
+
+  const strings = [];
   let winner = 0;
 
   for (let o = 0; o < rowLength; o += 1) {
     let string1 = '';
     let string2 = '';
 
-    strings[0] += points[o][o];
-    strings[1] += points[o][(points.length - 1) - o];
+    const pointso = points[o];
+
+    strings.push(pointso[o]);
+    strings.push(pointso[(points.length - 1) - o]);
 
     for (let i = 0; i < rowLength; i += 1) {
-      string1 += points[o][i];
+      string1 += pointso[i];
       string2 += points[i][o];
     }
 
-    strings.push(string1, string2);
+    strings.push(string1);
+    strings.push(string2);
   }
 
   strings.forEach((string) => {
