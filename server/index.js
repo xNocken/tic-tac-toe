@@ -1,6 +1,12 @@
-/* eslint-disable no-console */
 const fs = require('fs');
 const mime = require('mime-types');
+const socketio = require('socket.io');
+const dns = require('dns');
+const http = require('http');
+const https = require('https');
+const config = require('./config');
+
+let app;
 
 const handler = (req, res) => {
   console.log(`${req.connection.remoteAddress} requested "${req.url}"`);
@@ -18,15 +24,29 @@ const handler = (req, res) => {
     });
 };
 
-const app = require('http').createServer(handler);
-const io = require('socket.io')(app);
+if (config.globalSettings.https) {
+  console.log('starting with https');
+  // TODO: catch errors
+  const options = {
+    key: fs.readFileSync(config.globalSettings.key),
+    cert: fs.readFileSync(config.globalSettings.cert),
+  };
+
+  app = https.createServer(options, handler);
+} else {
+  console.log('starting with http');
+  app = http.createServer(handler);
+}
+
+const io = socketio(app);
 const sockets = require('./sockets');
-const config = require('./config');
 
 config.setSocket('io', io);
 
-app.listen(config.globalSettings.port, config.globalSettings.ip);
+dns.lookup(config.globalSettings.ip, {}, (err, ip) => {
+  app.listen(config.globalSettings.port, ip);
 
-sockets(io);
+  sockets(io);
 
-console.log(`listening on ${config.globalSettings.ip}:${config.globalSettings.port}`);
+  console.log(`listening on ${ip}:${config.globalSettings.port}`);
+});

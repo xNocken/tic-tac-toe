@@ -69,7 +69,7 @@ const endGame = (io, sessionId, winner, draw = false, left = false) => {
 
   if (winner) { message = `${io.sockets.connected[winnerId].username || 'Unnamed'} won`; }
   if (draw) { message = 'its a draw'; }
-  if (left) { message = 'Game ended: Not enough players'; }
+  if (left) { message = 'Game ended: Player left'; }
 
   io.to(sessionId).emit('updateStatus', { message });
   io.to(sessionId).emit('winning');

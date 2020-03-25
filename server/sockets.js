@@ -6,20 +6,22 @@ const logic = require('./logic');
 global.config = config;
 module.exports = (io) => {
   io.on('connection', (socket) => {
+
+    console.log(socket.id)
     socket.username = logic.escapeString(socket.request._query.name);
 
     if (socket.request._query.sessionId) {
       socket.sessionId = socket.request._query.sessionId;
     } else {
-      for (let i = 0; i < config.globalSettings.sessions.length; i += 1) {
-        if (config.globalSettings.sessions[i].players < 2) {
-          socket.sessionId = config.globalSettings.sessions[i].id;
+      console.log(io.sockets.adapter.rooms)
+      Object.entries(io.sockets.adapter.rooms).forEach((room) => {
+        if (room.length < 2) {
+          socket.sessionId = room.id;
         }
-      }
+      });
 
       if (!socket.sessionId) {
         socket.sessionId = socket.id;
-        config.globalSettings.sessions.push({ id: socket.sessionId, players: 0 });
         io.sockets.adapter.rooms[socket.sessionId].players = [];
       }
     }
@@ -27,31 +29,13 @@ module.exports = (io) => {
     socket.join(socket.sessionId);
     io.sockets.adapter.rooms[socket.sessionId].players.push(socket.id);
     socket.emit('updateStatus', { message: 'Conected to server. Press start to start a game' });
-    io.to(socket.id).emit('updateStatus', { message: `${socket.username} joined` });
+    io.to(socket.sessionId).emit('updateStatus', { message: `${socket.username} joined` });
 
-    config.globalSettings.sessions.forEach((session, index) => {
-      if (session.id === socket.sessionId) {
-        config.globalSettings.sessions[index].players += 1;
-      }
-    });
-
-    // eslint-disable-next-line no-console
     console.log(socket.username, 'Joined', socket.sessionId);
 
     socket.on('disconnect', () => {
       io.to(socket.sessionId).emit('updateStatus', { message: `${socket.username} left.` });
 
-      config.globalSettings.sessions.forEach((session, index) => {
-        if (session.id === socket.sessionId) {
-          config.globalSettings.sessions[index].players -= 1;
-
-          if (config.globalSettings.sessions[index].players === 0) {
-            config.globalSettings.sessions.splice(index, 1);
-          }
-        }
-      });
-
-      // eslint-disable-next-line no-console
       console.log(`${socket.username} left ${socket.sessionId}`);
     });
 

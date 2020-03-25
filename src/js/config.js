@@ -1,4 +1,4 @@
-import globals from '../../globalconfig';
+import globals from '../../config';
 
 const settings = {
   botDelay: 0,

@@ -16,4 +16,12 @@ module.exports = {
   },
   rules: {
   },
+  overrides: [
+    {
+      files: ['server/*.js'],
+      rules: {
+        'no-console': 0,
+      }
+    }
+  ]
 };
