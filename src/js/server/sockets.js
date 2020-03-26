@@ -9,7 +9,7 @@ let attempt = 0;
 export default () => {
   if (!config.settings.socket) {
     config.settings.socket = io(`${config.settings.https ? 'wss' : 'ws'}://${config.settings.ip}:${config.settings.port}`, {
-      query: `name=${config.settings.player1}`,
+      query: `name=${config.settings.player1}&sessionId=${config.settings.player2}`,
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
@@ -22,6 +22,7 @@ export default () => {
 
     config.settings.socket.on('rejected', (data) => {
       updateStatus(`CONNECTION FAILED: ${data.message}`, 'warning');
+      config.settings.socket = undefined;
     });
 
     config.settings.socket.on('fieldClick', (data) => {

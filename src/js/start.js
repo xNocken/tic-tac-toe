@@ -5,6 +5,14 @@ import server from './server/sockets';
 import renderer from './offline/renderer';
 
 export default () => {
+  $('#mode').on('change', () => {
+    if ($('#mode')[0].value === '3') {
+      $('#name2')[0].placeholder = 'SessionID';
+    } else {
+      $('#name2')[0].placeholder = 'Name player 2';
+    }
+  });
+
   $('#start-form').on('submit', (event) => {
     event.preventDefault();
 
@@ -18,8 +26,8 @@ export default () => {
       clicked: 0,
       inputBlocked: false,
       isPlayer1: true,
-      player1: target[0].value || 'Player 1',
-      player2: target[1].value || 'Player 2',
+      player1: target[0].value,
+      player2: target[1].value,
       maxFields: parseInt(fields, 10) ** 2,
     });
 

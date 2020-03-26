@@ -25,12 +25,19 @@ const handler = (req, res) => {
 };
 
 if (config.globalSettings.https) {
+  let options;
+
   console.log('starting with https');
-  // TODO: catch errors
-  const options = {
-    key: fs.readFileSync(config.globalSettings.key),
-    cert: fs.readFileSync(config.globalSettings.cert),
-  };
+  try {
+    options = {
+      key: fs.readFileSync(config.globalSettings.key),
+      cert: fs.readFileSync(config.globalSettings.cert),
+    };
+  } catch (err) {
+    console.error('Error while loading certificate or key');
+    console.error(err);
+    process.exit();
+  }
 
   app = https.createServer(options, handler);
 } else {
@@ -45,8 +52,6 @@ config.setSocket('io', io);
 
 dns.lookup(config.globalSettings.ip, {}, (err, ip) => {
   app.listen(config.globalSettings.port, ip);
-
   sockets(io);
-
   console.log(`listening on ${ip}:${config.globalSettings.port}`);
 });
