@@ -1,0 +1,7 @@
+module.exports = {
+  ip: '127.0.0.1',
+  port: 100,
+  https: false,
+  cert: 'path/to/cert',
+  key: 'pah/to/key',
+};

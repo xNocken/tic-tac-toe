@@ -1,8 +1,15 @@
-const globals = require('../globalconfig');
+const globals = require('../config');
+
+if (!globals.ip || !globals.port) {
+  console.error('You need to specify a ip and port in the config js and rebuild with webpack');
+  process.exit();
+}
 
 const globalSettings = {
   players: [],
-  sessions: [],
+  https: false,
+  cert: '',
+  key: '',
   ...globals,
 };
 
