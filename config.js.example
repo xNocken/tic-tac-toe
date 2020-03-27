@@ -4,4 +4,5 @@ module.exports = {
   https: false,
   cert: 'path/to/cert',
   key: 'pah/to/key',
+  maxUsersPerSession: -1,
 };

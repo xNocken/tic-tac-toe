@@ -10,21 +10,27 @@
 </head>
 
 <body>
-  <form id="start-form">
-    <input name="name" type="text" placeholder="Name player 1">
-    <input id="name2" name="name2" type="text" placeholder="Name player 2">
-    <input name="felder" type="number" min="3" max ="100" value="3">
-    <select id="mode" type="select">
-      <option value="1">1 Player</option>
-      <option value="2">2 Player</option>
-      <option value="3">2 Player (online)</option>
-    </select>
-    <input type="submit" value="Start">
-  </form>
-  <div id="status"></div>
+  <div class="header">
+    <form id="start-form">
+      <span>Name Player 1</span>
+      <input name="name" type="text" placeholder="Name player 1">
+      <span id="name2Span">Name Player 2</span>
+      <input id="name2" name="name2" type="text" placeholder="Name player 2">
+      <span>Grid size</span>
+      <input name="felder" type="number" min="3" max ="100" value="3">
+      <span>Mode</span>
+      <select id="mode" type="select">
+        <option value="1">1 Player</option>
+        <option value="2">2 Player</option>
+        <option value="3">2 Player (online)</option>
+      </select>
+      <input type="submit" value="Start">
+    </form>
+    <div id="status"></div>
+    <div id="players"></div>
+  </div>
 
   <div id="fields"></div>
-
   <script src="dist/app.js"></script>
 </body>
 

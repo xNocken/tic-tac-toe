@@ -1,18 +1,51 @@
 .field {
   display: inline-block;
-  height: 60px;
-  width: 60px;
+  position: relative;
+  height: 100px;
+  width: 100px;
   margin: 5px;
   border: 1px solid gray;
   background-color: white;
 
   &--clicked {
     &-player1 {
-      background-color: blue;
+      &::before {
+        content: '';
+        position: relative;
+        display: inline-block;
+        background-color: black;
+        width: 100px;
+        height: 1px;
+        transform: rotateZ(45deg);
+        top: 37px;
+        left: 0;
+      }
+
+      &::after {
+        content: '';
+        position: relative;
+        display: inline-block;
+        background-color: black;
+        width: 100px;
+        height: 1px;
+        transform: rotateZ(-45deg);
+        top: 18px;
+        left: 0;
+      }
     }
 
     &-player2 {
-      background-color: red;
+      &::before {
+        content: '';
+        display: inline-block;
+        position: relative;
+        width: 88px;
+        height: 88px;
+        border-radius: 100px;
+        top: 5px;
+        left: 5px;
+        border: black 1px solid;
+      }
     }
   }
 }
@@ -22,11 +55,43 @@
   flex-wrap: nowrap;
 }
 
+#start-form {
+  display: inline-block;
+  width: 19.5%;
+}
+
 #status {
-  height: 160px;
+  display: inline-block;
   overflow-y: auto;
+  width: 59.5%;
+  height: 100%;
 
   .warning {
     color: red;
   }
+}
+
+.header {
+  height: 195px;
+}
+
+span {
+  display: block;
+  margin-top: 5px;
+}
+
+#players {
+  width: 19.5%;
+  display: inline-block;
+  height: 100%;
+  vertical-align: top;
+}
+
+#fields {
+  margin-top: 30px;
+}
+
+input, select {
+  width: 170px;
+  box-sizing: border-box;
 }

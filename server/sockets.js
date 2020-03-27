@@ -10,12 +10,13 @@ module.exports = (io) => {
     const nameLength = username.length;
 
     socket.leave(socket.id);
-    if (nameLength < 5 || nameLength > 20) {
+    if (nameLength < 3 || nameLength > 20) {
       socket.emit('rejected', { message: 'Your name is too long or too short' });
       return;
     }
 
     socket.username = logic.escapeString(username);
+    socket.wins = 0;
 
     if (socket.request._query.sessionId) {
       socket.sessionId = socket.request._query.sessionId;
@@ -33,8 +34,10 @@ module.exports = (io) => {
 
     socket.join(socket.sessionId);
     socket.emit('updateStatus', { message: 'Conected to server. Press start to start a game' });
-    const room = io.sockets.adapter.rooms[socket.sessionId];
 
+    logic.updatePlayerList(io, socket.sessionId);
+
+    const room = io.sockets.adapter.rooms[socket.sessionId];
     const userLimit = config.globalSettings.maxUsersPerSession;
 
     if (room.length > userLimit && userLimit !== -1) {
@@ -58,6 +61,8 @@ module.exports = (io) => {
       if (room && room.gameRunning) {
         logic.endGame(io, socket.sessionId, 0, false, true);
       }
+
+      logic.updatePlayerList(io, socket.sessionId);
     });
 
     socket.on('startgame', (data) => {
@@ -87,6 +92,8 @@ module.exports = (io) => {
         if (room.clicked === room.fields.length ** 2) {
           logic.endGame(io, socket.sessionId, 0, true);
         }
+
+        logic.updatePlayerList(io, socket.sessionId);
       }
     });
   });

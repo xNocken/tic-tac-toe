@@ -66,6 +66,17 @@ export default () => {
       attempt = 0;
     });
 
+    config.settings.socket.on('updatePlayers', (data) => {
+      const wrapper = $('#players');
+      const getTemplate = (name, wins) => `<div>${name} Wins: ${wins}</div>`;
+
+      wrapper.empty();
+
+      data.forEach((infos) => {
+        wrapper.append(getTemplate(infos.username, infos.wins));
+      });
+    });
+
     return;
   }
 

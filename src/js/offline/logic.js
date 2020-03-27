@@ -70,7 +70,6 @@ export const fieldClick = ($element, isPlayer1) => {
   });
 };
 
-
 export const botMove = (fields) => {
   let move;
   const { botMode } = config.settings;
@@ -81,8 +80,11 @@ export const botMove = (fields) => {
   } else if (botMode === 'simple') {
     move = simpleBot(points, config.setSetting.isPlayer1 ? 1 : 2);
   } else {
+    // eslint-disable-next-line no-console
     console.error('invalid bot selected');
     return;
   }
-  fieldClick(fields[move.position.x][move.position.y], config.settings.isPlayer1);
+  if (move.position) {
+    fieldClick(fields[move.position.x][move.position.y], config.settings.isPlayer1);
+  }
 };

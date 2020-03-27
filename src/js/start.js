@@ -8,8 +8,10 @@ export default () => {
   $('#mode').on('change', () => {
     if ($('#mode')[0].value === '3') {
       $('#name2')[0].placeholder = 'SessionID';
+      $('#name2Span')[0].innerText = 'SessionID';
     } else {
       $('#name2')[0].placeholder = 'Name player 2';
+      $('#name2Span')[0].innerText = 'Name player 2';
     }
   });
 

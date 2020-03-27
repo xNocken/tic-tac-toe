@@ -72,11 +72,15 @@ const fieldClick = (io, sessionId, x, y) => {
 
 const endGame = (io, sessionId, winner, draw = false, left = false) => {
   const room = io.sockets.adapter.rooms[sessionId];
-  const winnerId =room.currentPlayers[winner - 1];
+  const winnerId = room.currentPlayers[winner - 1];
 
   room.gameRunning = false;
 
   let message;
+
+  if (!draw && !left) {
+    io.sockets.connected[winnerId].wins += 1;
+  }
 
   if (winner) { message = `${io.sockets.connected[winnerId].username || 'Unnamed'} won`; }
   if (draw) { message = 'its a draw'; }
@@ -84,6 +88,24 @@ const endGame = (io, sessionId, winner, draw = false, left = false) => {
 
   io.to(sessionId).emit('updateStatus', { message });
   io.to(sessionId).emit('winning');
+};
+
+const updatePlayerList = (io, sessionId) => {
+  const room = io.sockets.adapter.rooms[sessionId];
+  const users = [];
+
+  if (!room) {
+    return;
+  }
+
+  Object.keys(room.sockets).forEach((user) => {
+    users.push({
+      username: io.sockets.connected[user].username,
+      wins: io.sockets.connected[user].wins,
+    });
+  });
+
+  io.to(sessionId).emit('updatePlayers', users);
 };
 
 const startGame = (length, sessionId, io) => {
@@ -119,4 +141,5 @@ module.exports = {
   fieldClick,
   checkWinner,
   escapeString,
+  updatePlayerList,
 };

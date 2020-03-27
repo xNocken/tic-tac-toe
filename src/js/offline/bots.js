@@ -90,7 +90,6 @@ const generateMove = (x, y, points, player) => {
   newPoints[x][y] = player;
   const result = checkWinner(undefined, newPoints);
   if (result === player) {
-    // console.log(JSON.stringify(points));
     move.position.x = x;
     move.position.y = y;
   }
