@@ -59,6 +59,7 @@ const fieldClick = (io, sessionId, x, y) => {
 
   io.to(sessionId).emit('fieldClick', { player: isPlayer1 ? 1 : 2, x, y });
   io.to(sessionId).emit('updateStatus', { message: `Next player: ${io.sockets.connected[nextPlayerId].username || 'Unnamed'}` });
+  io.sockets.connected[nextPlayerId].emit('nextPlayer');
 
   const infos = isPlayer1 ? 1 : 2;
 
@@ -133,6 +134,7 @@ const startGame = (length, sessionId, io) => {
 
   io.to(sessionId).emit('generatefields', { length });
   io.to(sessionId).emit('updateStatus', { message: `Next player: ${io.sockets.connected[nextPlayerId].username}` });
+  io.sockets.connected[nextPlayerId].emit('nextPlayer');
 };
 
 module.exports = {

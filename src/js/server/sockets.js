@@ -8,6 +8,8 @@ let attempt = 0;
 
 export default () => {
   if (!config.settings.socket) {
+    let nextPlayerInterval;
+
     config.settings.socket = io(`${config.settings.https ? 'wss' : 'ws'}://${config.settings.ip}:${config.settings.port}`, {
       query: `name=${config.settings.player1}&sessionId=${config.settings.player2}`,
       reconnection: true,
@@ -18,6 +20,8 @@ export default () => {
 
     config.settings.socket.on('winning', () => {
       endGame();
+      clearInterval(nextPlayerInterval);
+      $('#fields').removeClass('next-player');
     });
 
     config.settings.socket.on('rejected', (data) => {
@@ -27,6 +31,8 @@ export default () => {
 
     config.settings.socket.on('fieldClick', (data) => {
       checkField(data.player, config.settings.field[data.x][data.y]);
+      clearInterval(nextPlayerInterval);
+      $('#fields').removeClass('next-player');
     });
 
     config.settings.socket.on('spectate', (data) => {
@@ -43,7 +49,9 @@ export default () => {
 
     config.settings.socket.on('disconnect', () => {
       updateStatus('Disconnected', 'warning');
+      clearInterval(nextPlayerInterval);
       $('#fields').empty();
+      $('#fields').removeClass('next-player');
     });
 
     config.settings.socket.on('reconnect_attempt', () => {
@@ -75,6 +83,12 @@ export default () => {
       data.forEach((infos) => {
         wrapper.append(getTemplate(infos.username, infos.wins));
       });
+    });
+
+    config.settings.socket.on('nextPlayer', () => {
+      nextPlayerInterval = setInterval(() => {
+        $('#fields').toggleClass('next-player');
+      }, 1000);
     });
 
     return;
