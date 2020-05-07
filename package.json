@@ -35,7 +35,7 @@
     "webpack-cli": "^3.3.9"
   },
   "dependencies": {
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "mime-types": "^2.1.25",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
